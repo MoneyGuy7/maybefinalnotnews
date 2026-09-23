@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Yakton — Deck</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+
+<div class="ticker-strip" id="tickerStrip">
+  <div class="ticker-track" id="tickerTrack"></div>
+</div>
+
+<div class="app-shell">
+  <aside class="sidebar">
+    <a class="brand" href="index.html">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span class="brand-word">YAKTON</span>
+    </a>
+
+    <ul class="nav-list">
+      <li>
+        <button class="nav-item active" data-view="stocks">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 17l6-6 4 4 8-8"/><path d="M21 7v6h-6"/></svg>
+          Stocks
+        </button>
+      </li>
+      <li>
+        <button class="nav-item" data-view="portfolio">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20V10M11 20V4M18 20v-7"/></svg>
+          Portfolio
+        </button>
+      </li>
+      <li>
+        <button class="nav-item" data-view="wallet">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2.5" y="5.5" width="19" height="14" rx="3"/><path d="M2.5 9.5h19M16 15h2.5"/></svg>
+          Wallet
+        </button>
+      </li>
+      <li>
+        <button class="nav-item" data-view="games">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="7" width="20" height="10" rx="4"/><path d="M7 12h4M9 10v4M16 11h.01M18.5 13h.01"/></svg>
+          Games
+        </button>
+      </li>
+      <li>
+        <button class="nav-item" data-view="projects">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l9 5v10l-9 5-9-5V7z"/><path d="M3.5 7.5L12 12l8.5-4.5M12 12v9"/></svg>
+          Projects
+        </button>
+      </li>
+    </ul>
+
+    <button class="settings-btn" id="settingsOpenBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V21a2 2 0 1 1-4 0v-.09A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.55-1H3a2 2 0 1 1 0-4h.09A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-1.55V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.4 9a1.7 1.7 0 0 0 1.55 1H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.51 1z"/></svg>
+      Settings
+    </button>
+
+    <p class="sidebar-foot">
+      Real prices need a free
+      <a href="https://twelvedata.com/pricing" target="_blank" rel="noopener">Twelve Data</a> key —
+      paste one in the box above the chart, no code editing required.
+    </p>
+  </aside>
+
+  <main class="main">
+
+    <!-- ============ STOCKS ============ -->
+    <section class="view active" id="view-stocks">
+      <div class="view-head">
+        <h1>Stocks</h1>
+        <p>Look up a ticker, scrub the chart for a price at any point, and pin the ones you want to keep an eye on.</p>
+      </div>
+
+      <div class="search-row">
+        <input type="text" id="symbolInput" placeholder="Search a ticker — try AAPL, TSLA, NVDA" autocomplete="off" />
+        <button class="btn btn-primary" id="lookupBtn">Look up</button>
+        <button class="btn" id="watchToggleBtn">+ Watch</button>
+      </div>
+
+      <div class="apikey-row" id="apiKeyRow">
+        <span class="apikey-label">No real prices loading?</span>
+        <input type="text" id="apiKeyInput" placeholder="Paste a free Twelve Data API key" autocomplete="off" />
+        <button class="btn btn-sm" id="apiKeySave">Save key</button>
+        <a class="apikey-link" href="https://twelvedata.com/pricing" target="_blank" rel="noopener">Get a free key</a>
+      </div>
+
+      <div class="stocks-layout">
+        <div>
+          <div class="panel quote-card" id="quoteCard">
+            <div class="quote-top">
+              <div>
+                <div class="quote-symbol" id="qSymbol">AAPL</div>
+                <div class="quote-name" id="qName">Apple Inc.</div>
+              </div>
+              <div style="text-align:right">
+                <div class="quote-price mono" id="qPrice">—</div>
+                <span class="quote-change mono" id="qChange">—</span>
+              </div>
+            </div>
+            <div class="quote-meta">
+              <div>Open<strong id="mOpen" class="mono">—</strong></div>
+              <div>Day high<strong id="mHigh" class="mono">—</strong></div>
+              <div>Day low<strong id="mLow" class="mono">—</strong></div>
+              <div>Prev close<strong id="mPrev" class="mono">—</strong></div>
+            </div>
+            <div class="data-flag" id="dataFlag">Loading real prices…</div>
+          </div>
+
+          <div class="crypto-strip" id="cryptoStrip" style="display:none">
+            <div class="panel crypto-box">
+              <div class="tile-label">24h high / low</div>
+              <div class="mono" id="cHighLow" style="font-size:15px;font-weight:700;margin-top:4px">—</div>
+            </div>
+            <div class="panel crypto-box">
+              <div class="tile-label">Bid / ask spread</div>
+              <div class="mono" id="cSpread" style="font-size:15px;font-weight:700;margin-top:4px">—</div>
+            </div>
+            <div class="panel crypto-box orderbook">
+              <div class="orderbook-col bids">
+                <h4>Bids</h4>
+                <div id="cBids"></div>
+              </div>
+              <div class="orderbook-col asks">
+                <h4>Asks</h4>
+                <div id="cAsks"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="range-row" id="rangeRow">
+            <button class="range-btn" data-range="1D">1D</button>
+            <button class="range-btn" data-range="1W">1W</button>
+            <button class="range-btn active" data-range="1M">1M</button>
+            <button class="range-btn" data-range="3M">3M</button>
+            <button class="range-btn" data-range="1Y">1Y</button>
+          </div>
+
+          <div class="panel chart-panel">
+            <div class="chart-canvas-wrap">
+              <canvas id="priceChart"></canvas>
+              <div class="chart-tooltip" id="chartTooltip">
+                <div class="t-price mono"></div>
+                <div class="t-date"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="side-col">
+          <div class="panel watchlist-panel">
+            <div class="watchlist-head">
+              <h3>Watchlist</h3>
+            </div>
+            <ul class="watchlist" id="watchlist"></ul>
+          </div>
+
+          <div class="panel popular-panel">
+            <h3>Popular</h3>
+            <div class="chip-row" id="popularChips"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PORTFOLIO ============ -->
+    <section class="view" id="view-portfolio">
+      <div class="view-head">
+        <h1>Portfolio</h1>
+        <p>Add what you actually hold and see live gain/loss against the price Yakton is already pulling in. Stored only in this browser.</p>
+      </div>
+
+      <div class="tiles-row">
+        <div class="panel tile">
+          <div class="tile-label">Net worth</div>
+          <div class="tile-value mono" id="pfNetWorth">$0.00</div>
+          <div class="tile-sub" id="pfDayChange">—</div>
+        </div>
+        <div class="panel tile">
+          <div class="tile-label">Total gain / loss</div>
+          <div class="tile-value mono" id="pfGain">$0.00</div>
+          <div class="tile-sub" id="pfGainPct">—</div>
+        </div>
+        <div class="panel tile">
+          <div class="tile-label">Positions</div>
+          <div class="tile-value mono" id="pfCount">0</div>
+          <div class="tile-sub">holdings tracked</div>
+        </div>
+      </div>
+
+      <form class="panel add-position-form" id="addPositionForm">
+        <input type="text" id="posSymbol" placeholder="Symbol — AAPL" autocomplete="off" required />
+        <input type="number" id="posShares" placeholder="Shares" step="any" min="0" autocomplete="off" required />
+        <input type="number" id="posCost" placeholder="Avg cost / share" step="any" min="0" autocomplete="off" required />
+        <button class="btn btn-primary" type="submit">+ Add position</button>
+      </form>
+
+      <div class="portfolio-layout">
+        <div class="panel positions-panel">
+          <table class="positions-table">
+            <thead>
+              <tr><th>Symbol</th><th>Shares</th><th>Avg cost</th><th>Price</th><th>Value</th><th>Gain/loss</th><th></th></tr>
+            </thead>
+            <tbody id="positionsBody"></tbody>
+          </table>
+          <div class="positions-empty" id="positionsEmpty">No positions yet — add one above.</div>
+        </div>
+
+        <div class="panel donut-panel">
+          <h3 style="margin:0;font-family:var(--font-display);font-size:14px;align-self:flex-start">Allocation</h3>
+          <canvas id="donutChart" width="180" height="180"></canvas>
+          <div class="donut-legend" id="donutLegend"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ WALLET ============ -->
+    <section class="view" id="view-wallet">
+      <div class="view-head">
+        <h1>Wallet</h1>
+        <p>Budgeting, a mock send/request flow, currency conversion, and price alerts — everything except real money moving.</p>
+      </div>
+
+      <div class="wallet-grid">
+        <div class="panel wallet-panel">
+          <h3>Budget</h3>
+          <p class="hint">Envelope-style monthly limits. Mark spend as you go.</p>
+          <div id="budgetList"></div>
+          <form class="add-budget-form" id="addBudgetForm">
+            <input type="text" id="budgetName" placeholder="Category" required />
+            <input type="number" id="budgetLimit" placeholder="Limit $" min="0" step="any" required />
+            <button class="btn btn-sm" type="submit">Add</button>
+          </form>
+        </div>
+
+        <div class="panel wallet-panel">
+          <h3>Send / request</h3>
+          <p class="hint">A mock flow — nothing here moves real money.</p>
+          <div class="send-tabs">
+            <button class="active" data-mode="send">Send</button>
+            <button data-mode="request">Request</button>
+          </div>
+          <div class="contact-row" id="contactRow"></div>
+          <div class="send-form-row">
+            <input type="number" id="sendAmount" placeholder="Amount $" min="0" step="any" />
+            <input type="text" id="sendNote" placeholder="For…" />
+          </div>
+          <button class="btn btn-primary" id="sendBtn" style="width:100%">Send</button>
+          <ul class="tx-history" id="txHistory"></ul>
+        </div>
+
+        <div class="panel wallet-panel">
+          <h3>Currency converter</h3>
+          <p class="hint">Live exchange rates.</p>
+          <div class="converter-row">
+            <div class="converter-field">
+              <label>Amount</label>
+              <input type="number" id="convAmount" value="100" min="0" step="any" />
+            </div>
+            <div class="converter-field">
+              <label>From</label>
+              <select id="convFrom"></select>
+            </div>
+            <button class="converter-swap" id="convSwap" type="button" title="Swap">⇄</button>
+            <div class="converter-field">
+              <label>To</label>
+              <select id="convTo"></select>
+            </div>
+          </div>
+          <div class="converter-result mono" id="convResult">—</div>
+          <div class="converter-rate" id="convRate"></div>
+        </div>
+
+        <div class="panel wallet-panel">
+          <h3>Price alerts</h3>
+          <p class="hint">Get a visual (and browser notification, if allowed) when a symbol crosses a price.</p>
+          <form class="alert-form" id="alertForm">
+            <input type="text" id="alertSymbol" placeholder="Symbol" required />
+            <select id="alertDir"><option value="above">Above</option><option value="below">Below</option></select>
+            <input type="number" id="alertPrice" placeholder="Price" min="0" step="any" required />
+            <button class="btn btn-sm" type="submit">Add alert</button>
+          </form>
+          <ul class="alert-list" id="alertList"></ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ GAMES ============ -->
+    <section class="view" id="view-games">
+      <div class="view-head">
+        <h1>Games</h1>
+        <p>Two small games, no install, no leaderboard pressure. Pick one.</p>
+      </div>
+
+      <div class="game-tabs">
+        <button class="game-tab active" data-game="ttt">Tic-tac-toe</button>
+        <button class="game-tab" data-game="snake">Snake</button>
+        <button class="game-tab" data-game="memory">Memory match</button>
+        <button class="game-tab" data-game="g2048">2048</button>
+      </div>
+
+      <div class="panel game-panel active" id="panel-ttt">
+        <p class="game-status" id="tttStatus">Your move — X starts.</p>
+        <div class="ttt-board" id="tttBoard"></div>
+        <div class="game-controls">
+          <button class="btn" id="tttReset">Reset board</button>
+        </div>
+      </div>
+
+      <div class="panel game-panel" id="panel-snake">
+        <div class="snake-wrap">
+          <div class="snake-score">Score: <strong id="snakeScore">0</strong></div>
+          <canvas id="snakeCanvas" width="360" height="360"></canvas>
+          <p class="snake-hint">Arrow keys or WASD to steer. Space to start / restart.</p>
+        </div>
+      </div>
+
+      <div class="panel game-panel" id="panel-memory">
+        <p class="game-status" id="memoryStatus">Find every pair in as few moves as you can.</p>
+        <div class="memory-board" id="memoryBoard"></div>
+        <div class="game-controls">
+          <button class="btn" id="memoryReset">Shuffle &amp; reset</button>
+        </div>
+      </div>
+
+      <div class="panel game-panel" id="panel-g2048">
+        <div class="g2048-wrap">
+          <div class="g2048-score">Score: <strong id="g2048Score">0</strong></div>
+          <div class="g2048-board" id="g2048Board"></div>
+          <p class="game-status" id="g2048Status">Arrow keys or WASD to slide the tiles.</p>
+          <div class="game-controls">
+            <button class="btn" id="g2048Reset">New game</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PROJECTS ============ -->
+    <section class="view" id="view-projects">
+      <div class="view-head">
+        <h1>Projects</h1>
+        <p>Code you can pull straight from this deck. Swap in your own repos by editing <code>assets/js/projects-data.js</code>.</p>
+      </div>
+
+      <div class="project-grid" id="projectGrid"></div>
+    </section>
+
+  </main>
+</div>
+
+<div class="settings-overlay" id="settingsOverlay">
+  <div class="settings-panel">
+    <button class="settings-close" id="settingsCloseBtn" aria-label="Close settings">×</button>
+    <h2>Settings</h2>
+
+    <div class="settings-group">
+      <label class="settings-label">Theme</label>
+      <div class="theme-switch" id="themeSwitch">
+        <button data-theme="dark">Dark</button>
+        <button data-theme="light">Light</button>
+      </div>
+    </div>
+
+    <div class="settings-group">
+      <label class="settings-label">Display currency</label>
+      <select class="settings-select" id="displayCurrency">
+        <option value="USD">USD — US Dollar</option>
+        <option value="EUR">EUR — Euro</option>
+        <option value="GBP">GBP — British Pound</option>
+        <option value="JPY">JPY — Japanese Yen</option>
+        <option value="CAD">CAD — Canadian Dollar</option>
+      </select>
+    </div>
+
+    <div class="settings-group">
+      <label class="settings-label">Twelve Data API key</label>
+      <div class="apikey-row is-set" style="margin:0">
+        <input type="text" id="apiKeyInputSettings" placeholder="Paste a free Twelve Data API key" autocomplete="off" />
+        <button class="btn btn-sm" id="apiKeySaveSettings">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="assets/js/projects-data.js"></script>
+<script src="assets/js/main.js"></script>
+<script src="assets/js/settings.js"></script>
+<script src="assets/js/stocks.js"></script>
+<script src="assets/js/portfolio.js"></script>
+<script src="assets/js/wallet.js"></script>
+<script src="assets/js/games.js"></script>
+<script src="assets/js/projects.js"></script>
+</body>
+</html>
